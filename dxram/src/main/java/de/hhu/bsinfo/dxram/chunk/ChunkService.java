@@ -194,6 +194,19 @@ public class ChunkService extends AbstractDXRAMService<ChunkServiceConfig> imple
         return status;
     }
 
+	public long reserve(DataStructure p_datastructure){
+         long chunkID = ChunkID.INVALID_ID;
+         try {
+             m_memoryManager.lockManage();
+             chunkID = m_memoryManager.reserveChunkID();
+             p_datastructure.setID(chunkID);
+         } finally {
+             m_memoryManager.unlockManage();
+         }
+         return chunkID;
+     }
+
+
     /**
      * Create new chunks.
      *
@@ -312,7 +325,12 @@ public class ChunkService extends AbstractDXRAMService<ChunkServiceConfig> imple
             long chunkID;
             try {
                 m_memoryManager.lockManage();
-                chunkID = m_memoryManager.create(p_dataStructures[0].sizeofObject());
+                if(p_dataStructures[0].getID() == ChunkID.INVALID_ID) {
+                    chunkID = m_memoryManager.create(p_dataStructures[0].sizeofObject());
+                } else {
+                    chunkID = m_memoryManager.create(p_dataStructures[0].getID(),p_dataStructures[0].sizeofObject());
+                }
+                //chunkID = m_memoryManager.create(p_dataStructures[0].sizeofObject());
 
                 // Initialize a new backup range every e.g. 256 MB and inform superpeer
                 // Must be locked together with create call to memory manager

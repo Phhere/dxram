@@ -197,6 +197,17 @@ public final class MemoryManagerComponent extends AbstractDXRAMComponent<MemoryM
     }
 
     // -----------------------------------------------------------------------------
+    /**
+     * reserve a free ChunkID in cid table
+     * @return the ChunkID
+     */
+    public long reserveChunkID(){
+        long chunkID;
+        long lid;
+        lid = m_cidTable.getFreeLID();
+        chunkID = ((long) m_boot.getNodeID() << 48) + lid;
+        return chunkID;
+    }
 
     /**
      * The chunk ID 0 is reserved for a fixed index structure.
